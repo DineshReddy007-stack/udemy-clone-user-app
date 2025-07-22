@@ -1,7 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */images: {
+  /* config options here */
+  output: 'export', // Enables static export
+  trailingSlash: true, // Adds trailing slash to URLs
+  images: {
+    unoptimized: true, // Required for static export
     remotePatterns: [
       {
         protocol: 'https',
@@ -15,17 +19,16 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
-       
     ],
   },
   eslint: {
-       // Ignore ESLint errors during build
-       ignoreDuringBuilds: true,
-      },
-      typescript: {
+    // Ignore ESLint errors during build
+    ignoreDuringBuilds: true,
+  },
+  typescript: {
     // Ignore TypeScript errors during build (optional)
     ignoreBuildErrors: true,
-   },
+  },
 };
 
 export default nextConfig;
