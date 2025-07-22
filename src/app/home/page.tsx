@@ -37,7 +37,7 @@ export default function HomePage() {
       
       console.log('🔍 Loading courses from API...');
       
-      const response = await fetch('http://localhost:5000/api/courses');
+      const response = await fetch('https://udemy-clone-api-rbe6.onrender.com/api/courses');
       const data = await response.json();
       
       console.log('🔍 Raw API Response:', data);

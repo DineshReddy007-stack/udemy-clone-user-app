@@ -1,7 +1,7 @@
 // src/config/api.ts - Fixed Version
 export const API_CONFIG = {
   // Base URL without /api
-  BASE_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000',
+  BASE_URL: process.env.NEXT_PUBLIC_API_URL || 'https://udemy-clone-api-rbe6.onrender.com',
   ENDPOINTS: {
     // Auth endpoints
     AUTH: {
