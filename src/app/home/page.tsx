@@ -1,6 +1,7 @@
+// app/home/page.jsx
 "use client";
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/lib/store';
@@ -8,88 +9,53 @@ import React from "react";
 import TopBar from "@/components/ui/TopBar";
 import CategoryNav from "@/components/ui/CategoryNav";
 import HeroCarousel from "@/components/ui/HeroCarousel";
-import CourseCard, { Course } from "@/components/ui/CourseCard";
+import CourseCard from "@/components/ui/CourseCard";
 import Footer from "@/components/ui/Footer";
-
-const sampleCourses: Course[] = [
-  {
-    id: "1",
-    title: "React for Beginners",
-    instructor: "Jane Doe",
-    rating: 4.5,
-    price: "$49.99",
-    thumbnail: "/images/courses/pythonfordatascience.jpg",
-  },
-  {
-    id: "2",
-    title: "Mastering TypeScript",
-    instructor: "John Smith",
-    rating: 4.7,
-    price: "$59.99",
-    thumbnail: "/images/courses/typescript.png",
-  },
-  {
-    id: "3",
-    title: "JavaScript Fundamentals",
-    instructor: "Alice Johnson",
-    rating: 4.6,
-    price: "$39.99",
-    thumbnail: "/images/courses/java.png",
-  },
-  {
-    id: "4",
-    title: "Node.js Complete Guide",
-    instructor: "Bob Wilson",
-    rating: 4.8,
-    price: "$69.99",
-    thumbnail: "/images/courses/node.png",
-  },
-  {
-    id: "5",
-    title: "CSS Grid & Flexbox",
-    instructor: "Emma Davis",
-    rating: 4.4,
-    price: "$29.99",
-    thumbnail: "/images/courses/cssandgrid.png",
-  },
-  {
-    id: "6",
-    title: "Python for Data Science",
-    instructor: "Michael Brown",
-    rating: 4.9,
-    price: "$79.99",
-    thumbnail: "/images/courses/pythonfordatascience.jpg",
-  },
-  {
-    id: "7",
-    title: "AWS Cloud Practitioner",
-    instructor: "Sarah Miller",
-    rating: 4.7,
-    price: "$89.99",
-    thumbnail: "/images/courses/aws.png",
-  },
-  {
-    id: "8",
-    title: "Docker & Kubernetes",
-    instructor: "David Lee",
-    rating: 4.5,
-    price: "$99.99",
-    thumbnail: "/images/courses/kuber.jpg",
-  },
-];
-
-const popularCourses = sampleCourses.slice(0, 4);
-const featuredCourses = sampleCourses.slice(4, 8);
 
 export default function HomePage() {
   const router = useRouter();
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+  
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     if (!isAuthenticated) {
-      router.replace('/signin'); // Use replace instead of push
+      router.replace('/signin');
     }
   }, [isAuthenticated, router]);
+
+  useEffect(() => {
+    loadCourses();
+  }, []);
+
+  const loadCourses = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      console.log('🔍 Loading courses from API...');
+      
+      const response = await fetch('http://localhost:5000/api/courses');
+      const data = await response.json();
+      
+      console.log('🔍 Raw API Response:', data);
+      
+      if (data.success && data.courses) {
+        console.log('✅ Courses loaded:', data.courses.length);
+        setCourses(data.courses);
+      } else {
+        console.log('❌ No courses found');
+        setError('No courses found');
+      }
+    } catch (err) {
+      console.error('❌ API Error:', err);
+      setError(err.message || 'Failed to load courses');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (!isAuthenticated) {
     return (
@@ -98,6 +64,9 @@ export default function HomePage() {
       </div>
     );
   }
+
+  const featuredCourses = courses.slice(0, 4);
+  const popularCourses = courses.slice(4, 8);
 
   return (
     <div className="min-h-screen bg-white">
@@ -120,11 +89,34 @@ export default function HomePage() {
               View All
             </button>
           </div>
-          <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {featuredCourses.map((course) => (
-              <CourseCard key={course.id} course={course} />
-            ))}
-          </div>
+          
+          {loading ? (
+            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {[...Array(4)].map((_, index) => (
+                <div key={index} className="animate-pulse">
+                  <div className="bg-gray-200 h-48 rounded-lg mb-4"></div>
+                  <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                </div>
+              ))}
+            </div>
+          ) : error ? (
+            <div className="text-center py-12">
+              <p className="text-red-500 mb-4">{error}</p>
+              <button 
+                onClick={loadCourses}
+                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+              >
+                Retry
+              </button>
+            </div>
+          ) : (
+            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {featuredCourses.map((course) => (
+                <CourseCard key={course._id} course={course} />
+              ))}
+            </div>
+          )}
         </section>
 
         {/* Popular Courses Section */}
@@ -135,11 +127,14 @@ export default function HomePage() {
               View All
             </button>
           </div>
-          <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {popularCourses.map((course) => (
-              <CourseCard key={course.id} course={course} />
-            ))}
-          </div>
+          
+          {!loading && !error && (
+            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {popularCourses.map((course) => (
+                <CourseCard key={course._id} course={course} />
+              ))}
+            </div>
+          )}
         </section>
 
         {/* Categories Section */}

@@ -61,33 +61,7 @@ export const topBarData: TopBarData = {
   },
   
   navigationItems: [
-    {
-      id: "nav-business-001",
-      label: "Udemy Business",
-      type: "dropdown",
-      className: "text-black hover:text-purple-600 px-3 py-1 rounded-md transition",
-      hoverCard: {
-        id: "hover-business-001",
-        description: "Get your team access to over 30,000 top Udemy courses, anytime, anywhere.",
-        buttonText: "Try Udemy Business",
-        buttonLink: "/business/try",
-        width: "w-80"
-      }
-    },
-    {
-      id: "nav-teach-001",
-      label: "Teach on Udemy",
-      type: "dropdown",
-      className: "text-black hover:text-purple-600 px-3 py-1 rounded-md transition",
-      hoverCard: {
-        id: "hover-teach-001",
-        title: "Turn what you know into an opportunity and reach millions around the world.",
-        description: "",
-        buttonText: "Learn more",
-        buttonLink: "/teach/learn-more",
-        width: "w-96"
-      }
-    },
+    
     {
       id: "nav-learning-001",
       label: "My Learning",
